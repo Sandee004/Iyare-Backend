@@ -287,8 +287,8 @@ def get_user():
         "user": {
             "name": user.name,
             "phoneNumber": user.phone_number,
-            "nextOfKinName": user.next_of_kin_name,
-            "nextOfKinPhoneNumber": user.next_of_kin_phone_number,
+            "nextOfKinName": user.nextOfKinName,
+            "nextOfKinPhoneNumber": user.nextOfKinPhoneNumber,
         }
     })
 
