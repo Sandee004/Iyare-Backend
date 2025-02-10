@@ -129,7 +129,7 @@ def login():
                 "id": user.id,
                 "name": user.name,
                 "email": user.email,
-                "phoneNumber": user.phone_number
+                "phoneNumber": user.phoneNumber
             }
         })
 
