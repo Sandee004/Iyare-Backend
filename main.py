@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from datetime import timedelta
 from datetime import datetime
+from sqlalchemy import and_
 
 app = Flask(__name__)
 app.config["JWT_SECRET_KEY"] = "fish"
@@ -210,18 +211,25 @@ def book_seat():
     if isinstance(bus_id, str) and bus_id.isdigit():
         bus_id = int(bus_id)
 
-    seats = Seat.query.filter(Seat.bus_id == bus_id, Seat.seat_number.in_(seat_numbers)).all()
+    # Transactional Check and Lock
+    seats = Seat.query.filter(
+        and_(
+            Seat.bus_id == bus_id,
+            Seat.seat_number.in_(seat_numbers),
+            Seat.status == "available"  # Check if seat is still available
+        )
+    ).with_for_update().all()  # Locks the rows for update
 
     if len(seats) != len(seat_numbers):
-        return jsonify({"message": "Some seats are already booked or do not exist"}), 400
+        return jsonify({"message": "Some seats are already booked"}), 400
 
+    # If all seats are available, proceed to book them
     for seat in seats:
         seat.status = "booked"
 
     db.session.commit()
 
     return jsonify({"message": "Seats booked successfully!"}), 200
-
 
 def seed_seats():
     if not Seat.query.first():
